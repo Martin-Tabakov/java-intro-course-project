@@ -1,6 +1,9 @@
 public class Party {
-    int pos;
-    public void startParty(int playerId){
-        System.out.println("Party started! Host is Player "+playerId);
+    public void startParty(Player player){
+        System.out.println("Party started! Host is Player "+player.id);
+        partyHard(player);
+    }
+    private void partyHard(Player player){
+        player.cash-=25;
     }
 }
