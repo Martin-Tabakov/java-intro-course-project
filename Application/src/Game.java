@@ -1,7 +1,7 @@
 import java.util.Random;
 
 public class Game {
-
+    int gameCycle = 0;
     Tile[] gameBoard = new Tile[20];
     Player[] players = new Player[5];
 
@@ -46,12 +46,37 @@ public class Game {
         players[4] = new Player(5, true, 0);
     }
 
-    public void makeCycle() {
-        for (int i=0;i<players.length;i++){
-            players[i].makeTurn();
-
-            gameBoard[players[i].pos].setTile(players[i].id);
+    public void gameCycle() {
+        gameCycle++;
+        boolean isPartialCycle = false;
+        while (!isPartialCycle) {
+            printBoard();
+            printPlayerInfo();
+            isPartialCycle= playerCycle();
         }
+        sortPlayers();
+    }
+
+    public boolean playerCycle() {
+        Player currentPlayer;
+        int cnt =0;
+
+        for (Player player : players) {
+            currentPlayer = player;
+
+            if (currentPlayer.cycle == gameCycle) {
+                player.makeTurn();
+            } else cnt++;
+
+            if (currentPlayer.pos > 19) {
+                currentPlayer.pos = 0;
+                currentPlayer.cycle++;
+
+            }
+            System.out.println("Player " + currentPlayer.id + " moved to position " + currentPlayer.pos);
+            gameBoard[currentPlayer.pos].setTile(currentPlayer);
+        }
+        return cnt==players.length;
     }
 
     public void sortPlayers() {
@@ -64,14 +89,6 @@ public class Game {
                     players[j + 1] = temp;
                 }
 
-    }
-
-    public void printPlayers() {
-        for (Player player : players) {
-            System.out.print("id " + player.id);
-            System.out.print("pos " + player.pos);
-        }
-        System.out.println();
     }
 
     /**
@@ -87,9 +104,9 @@ public class Game {
 
             temp = gameBoard[newPos];
             gameBoard[newPos] = gameBoard[i];
-            gameBoard[newPos].pos=newPos;
+            gameBoard[newPos].pos = newPos;
             gameBoard[i] = temp;
-            gameBoard[i].pos=i;
+            gameBoard[i].pos = i;
         }
     }
 
@@ -97,24 +114,62 @@ public class Game {
      * Prints the board to the console
      */
     public void printBoard() {
-
-        for (Tile tile : gameBoard) System.out.print("|" + tile.tileSymbol + "|");
-        System.out.println();
-        for (Tile tile : gameBoard) System.out.print("|" + tile.pos + "|");
-        System.out.println();
-
-        /*int l=gameBoard.length;
-        for(int i=l/2;i<l;i++)
-            System.out.print("|"+ gameBoard[i].tileSymbol+"|");
-        System.out.println();
-        for (int i=l/2-1;i>=0;i--)
-            System.out.print("|"+ gameBoard[i].tileSymbol+"|");
-        System.out.println();*/
+        printLine(46);
+        printUpperBoard();
+        printMiddleBoard();
+        printLowerBoard();
+        printLine(46);
     }
-/*    public static void printLine(int len,boolean isLower){
-        if(isLower) for(int i=0;i<len;i++) System.out.print("_");
-        else  for(int i=0;i<len;i++) System.out.print("~");
-        System.out.println();
-    }*/
+    private void printUpperBoard(){
+        System.out.print("|      ");
+        for (int i = 10; i <= 17; i++) System.out.print(String.format("|%d|",i));
+        System.out.println("      |");
+        System.out.print("|      ");
+        for (int i = 10; i <= 17; i++) System.out.print(String.format("|%s|", gameBoard[i].tileSymbol));
+        System.out.println("      |");
 
+    }
+    private void printMiddleBoard(){
+
+        System.out.print(String.format("|  |%d ||%s|                        ",9, gameBoard[9].tileSymbol));
+        System.out.println(String.format("|%s||%d|  |", gameBoard[18].tileSymbol,18));
+
+        System.out.print(String.format("|  |%d ||%s|                        ",8, gameBoard[8].tileSymbol));
+        System.out.println(String.format("|%s||%d|  |", gameBoard[19].tileSymbol,19));
+
+
+    }
+    private void printLowerBoard(){
+        System.out.print("|      ");
+        for (int i = 7; i >= 0; i--) System.out.print(String.format("|%s|", gameBoard[i].tileSymbol));
+        System.out.println("      |");
+        System.out.print("|      ");
+        for (int i = 7; i >= 0; i--) System.out.print(String.format("|%d |",i));
+        System.out.println("      |");
+    }
+
+
+    public void printPlayerInfo(){
+        printLine();
+        String playerName;
+        for (Player player :
+                players) {
+            if(player.isBot) playerName="Bot";
+            else  playerName = "Player";
+            String playerInfo = String.format("|%s %d is located at position %d with cash balance %d"
+                    ,playerName,player.id,player.pos,player.cash);
+            String blankSpaces = " ".repeat(60-playerInfo.length()-1);
+            System.out.println(String.format("%s%s|",playerInfo,blankSpaces));
+        }
+        printLine();
+    }
+
+    public void printLine(int x){
+        for (int i=0;i< x;i++) System.out.print("-");
+        System.out.println();
+    }
+    public void printLine(){
+        for (int i=0;i< 60;i++) System.out.print("-");
+        System.out.println();
+    }
 }
