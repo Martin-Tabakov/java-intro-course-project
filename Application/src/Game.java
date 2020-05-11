@@ -10,7 +10,6 @@ public class Game {
         initPlayers();
     }
 
-
     /**
      * Sets the initial tile positions for the tiles
      */
@@ -64,10 +63,7 @@ public class Game {
      * Calculates парички for players after completing a game cycle
      */
     private void calculateBalance(){
-
-        for (Player player : players) {
-            Start.calculateCash(player);
-        }
+        for (Player player : players) Start.calculateCash(player);
     }
     /**
      * Assigns every player an evil plan
@@ -95,8 +91,10 @@ public class Game {
                 if (currentPlayer.pos > 19) {
                     currentPlayer.pos = 0;
                     currentPlayer.cycle++;
+                    System.out.println("Player "+player.id+" moves to "+player.pos);
                     continue;
                 }
+                System.out.println("Player "+player.id+" moves to "+player.pos);
                 gameBoard[currentPlayer.pos].setTile(currentPlayer);
             } else playersMadeCycle++;
 
@@ -116,7 +114,6 @@ public class Game {
                     players[j] = players[j + 1];
                     players[j + 1] = tempPlayer;
                 }
-
     }
 
     /**
@@ -138,28 +135,58 @@ public class Game {
         }
     }
 
+
+    private void printTiles(int begin,int end,int offset,boolean reverse){
+        System.out.println(String.format("|%s|%s|%s|",
+                " ".repeat(offset),
+                String.join("||",getRoll(begin,end,reverse)),
+                " ".repeat(offset)
+        ));
+    }
+
+    private String[] getRoll(int begin,int end,boolean reverse){
+        String[] tiles = new  String[end-begin+1];
+        for(int i=0;i<tiles.length;i++) tiles[i]=(reverse)? gameBoard[end-i].tileSymbol:gameBoard[begin+i].tileSymbol;
+        return tiles;
+    }
+
+    private void printNumbers(int begin,int end,int offset,boolean reverse){
+        System.out.println(String.format("|%s|%s|%s|",
+                " ".repeat(offset),
+                String.join("||",createArray(begin,end,reverse)),
+                " ".repeat(offset)
+        ));
+    }
+
+    private String[] createArray(int firstPos,int lastPos,boolean reverse){
+        String[] newArray = new String[lastPos-firstPos+1];
+        for(int i=0;i<newArray.length;i++) newArray[i]=(reverse)? convertNum(lastPos-i) : convertNum(firstPos+i);
+
+        return  newArray;
+    }
+
+    private String convertNum(int num){
+        return (num>9)? String.valueOf(num):(num)+" ";
+    }
+
     /**
      * Prints the game board to the console
      */
     public void printBoard() {
-        printLine(46);
-        printUpperBoard();
+        int offset = 13;
+        printLine(60);
+        printUpperBoard(offset);
         printMiddleBoard();
-        printLowerBoard();
-        printLine(46);
+        printLowerBoard(offset);
+        printLine(60);
     }
 
     /**
      * Prints the upper part of the game board - tile positions [10;17]
      */
-    private void printUpperBoard(){
-        System.out.print("|      ");
-        for (int i = 10; i <= 17; i++) System.out.print(String.format("|%d|",i));
-        System.out.println("      |");
-        System.out.print("|      ");
-        for (int i = 10; i <= 17; i++) System.out.print(String.format("|%s|", gameBoard[i].tileSymbol));
-        System.out.println("      |");
-
+    private void printUpperBoard(int offset){
+        printNumbers(10,17,offset,false);
+        printTiles(10,17,offset,false);
     }
 
     /**
@@ -167,11 +194,11 @@ public class Game {
      */
     private void printMiddleBoard(){
 
-        System.out.print(String.format("|  |%d ||%s|                        ",9, gameBoard[9].tileSymbol));
-        System.out.println(String.format("|%s||%d|  |", gameBoard[18].tileSymbol,18));
+        System.out.print(String.format("|         |%d ||%s|                        ",9, gameBoard[9].tileSymbol));
+        System.out.println(String.format("|%s||%d|         |", gameBoard[18].tileSymbol,18));
 
-        System.out.print(String.format("|  |%d ||%s|                        ",8, gameBoard[8].tileSymbol));
-        System.out.println(String.format("|%s||%d|  |", gameBoard[19].tileSymbol,19));
+        System.out.print(String.format("|         |%d ||%s|                        ",8, gameBoard[8].tileSymbol));
+        System.out.println(String.format("|%s||%d|         |", gameBoard[19].tileSymbol,19));
 
 
     }
@@ -179,32 +206,34 @@ public class Game {
     /**
      * Prints the lower part of the game board - tile positions [0;7]
      */
-    private void printLowerBoard(){
-        System.out.print("|      ");
-        for (int i = 7; i >= 0; i--) System.out.print(String.format("|%s|", gameBoard[i].tileSymbol));
-        System.out.println("      |");
-        System.out.print("|      ");
-        for (int i = 7; i >= 0; i--) System.out.print(String.format("|%d |",i));
-        System.out.println("      |");
+    private void printLowerBoard(int offset){
+        printTiles(0,7,offset,true);
+        printNumbers(0,7,offset,true);
     }
+
+
 
     /**
      * Prints the player information needed for the current player to take a decision.
      * The player`s ID, position, current парички balance
      */
     public void printPlayerInfo(){
-        // TODO: 11-May-20 Add option to show detailed information about all players
         printLine(60);
         String playerName;
-        for (Player player :
-                players) {
-            if(player.isBot) playerName="Bot";
-            else  playerName = "Player";
+        for (Player player :players) {
+            playerName=(player.isBot)?"Bot":"Player";
 
-            String playerInfo = String.format("|%s %d is located at position %d with cash balance %d"
-                    ,playerName,player.id,player.pos,player.cash);
-            String blankSpaces = " ".repeat(60-playerInfo.length()-1);
-            System.out.println(String.format("%s%s|",playerInfo,blankSpaces));
+            String playerInfo = String.format("%s %d is located at position %d with cash balance %d"
+                    ,playerName,
+                    player.id,
+                    player.pos
+                    ,player.cash);
+
+            int totalSpaces =58-playerInfo.length();
+                String rightSpaces = " ".repeat(totalSpaces/2+totalSpaces%2);
+                String leftSpaces = " ".repeat(totalSpaces/2);
+
+            System.out.println(String.format("|%s%s%s|",leftSpaces,playerInfo,rightSpaces));
         }
         printLine(60);
     }
@@ -214,6 +243,6 @@ public class Game {
      * @param repetitions the number of character repetitions
      */
     public void printLine(int repetitions){
-        System.out.println("-".repeat(repetitions));
+        System.out.println("=".repeat(repetitions));
     }
 }
