@@ -1,6 +1,11 @@
 public class Start {
-    int pos;
-    public void calculateCash(int playerId){
-        System.out.println("The start of an adventure for Player "+playerId);
+    public static void calculateCash(Player player){
+
+        System.out.println("The start of an adventure for Player "+player.id);
+    }
+
+    public static void assignEvilPlan(Player player){
+        player.planId= Application.throwDice(1,3);
+        player.isPlanActive=false;
     }
 }

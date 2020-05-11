@@ -41,7 +41,7 @@ public class Game {
      */
     public void makeCycle() {
         gameCycle++;
-
+        assignEvilPlans();
         boolean isPartialCycle = false;
         while (!isPartialCycle) {
             printBoard();
@@ -49,6 +49,33 @@ public class Game {
             isPartialCycle= playerCycle();
         }
         sortPlayers();
+        calculateBalance();
+        clearTiles();
+    }
+
+    /**
+     * Resets all {@code Steal} tiles to be reused
+     */
+    private void clearTiles(){
+        for (Tile tile : gameBoard) if (tile.id == 2) tile.steal.clearTile();
+    }
+
+    /**
+     * Calculates парички for players after completing a game cycle
+     */
+    private void calculateBalance(){
+
+        for (Player player : players) {
+            Start.calculateCash(player);
+        }
+    }
+    /**
+     * Assigns every player an evil plan
+     */
+    private void assignEvilPlans(){
+        for (Player player : players) {
+            Start.assignEvilPlan(player);
+        }
     }
 
     /**

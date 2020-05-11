@@ -11,4 +11,8 @@ public class Steal {
         planId= player.planId;
         player.isPlanActive=true;
     }
+    public void clearTile(){
+        this.planId=0;
+        isTaken=false;
+    }
 }
