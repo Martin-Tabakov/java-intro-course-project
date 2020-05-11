@@ -12,42 +12,36 @@ public class Game {
 
 
     /**
-     * Sets the initial tile positions
+     * Sets the initial tile positions for the tiles
      */
     private void initBoard() {
-        //Специално за Михаил Петров
+        int id=1,i;
         gameBoard[0] = new Tile(0, 0);
-        gameBoard[1] = new Tile(1, 1);
-        gameBoard[2] = new Tile(1, 2);
-        gameBoard[3] = new Tile(1, 3);
-        gameBoard[4] = new Tile(2, 4);
-        gameBoard[5] = new Tile(2, 5);
-        gameBoard[6] = new Tile(2, 6);
-        gameBoard[7] = new Tile(3, 7);
-        gameBoard[8] = new Tile(3, 8);
-        gameBoard[9] = new Tile(3, 9);
-        gameBoard[10] = new Tile(4, 10);
-        gameBoard[11] = new Tile(4, 11);
-        gameBoard[12] = new Tile(4, 12);
-        gameBoard[13] = new Tile(5, 13);
-        gameBoard[14] = new Tile(5, 14);
-        gameBoard[15] = new Tile(5, 15);
-        gameBoard[16] = new Tile(5, 16);
-        gameBoard[17] = new Tile(5, 17);
-        gameBoard[18] = new Tile(5, 18);
-        gameBoard[19] = new Tile(5, 19);
+        for(i=1;i<=3;i++) gameBoard[i] = new Tile(id,i);
+        id=2;
+        for(;i<=6;i++) gameBoard[i] = new Tile(id,i);
+        id=3;
+        for(;i<=9;i++) gameBoard[i] = new Tile(id,i);
+        id=4;
+        for(;i<=12;i++) gameBoard[i] = new Tile(id,i);
+        id=5;
+        for(;i<=19;i++) gameBoard[i] = new Tile(id,i);
     }
 
+    /**
+     * Initialises the partaker`s positions and IDs
+     */
     private void initPlayers() {
         players[0] = new Player(1, false, 0);
-        players[1] = new Player(2, true, 0);
-        players[2] = new Player(3, true, 0);
-        players[3] = new Player(4, true, 0);
-        players[4] = new Player(5, true, 0);
+        for(int i=1;i<5;i++) players[i] = new Player(i+1, true, 0);
     }
 
-    public void gameCycle() {
+    /**
+     * Makes a game cycle - all players go through the board to the starting position from where they began
+     */
+    public void makeCycle() {
         gameCycle++;
+
         boolean isPartialCycle = false;
         while (!isPartialCycle) {
             printBoard();
@@ -57,61 +51,68 @@ public class Game {
         sortPlayers();
     }
 
+    /**
+     * Cycles through the list of players prompting them to take a turn.
+     * If the player`s cycle is equal to the game cycle a move will be made and the tile where the player lands will be activated
+     * @return {@code true} if all players made a cycle, otherwise {@code true}
+     */
     public boolean playerCycle() {
         Player currentPlayer;
-        int cnt =0;
+        int playersMadeCycle =0;
 
         for (Player player : players) {
             currentPlayer = player;
 
             if (currentPlayer.cycle == gameCycle) {
                 player.makeTurn();
-            } else cnt++;
+                if (currentPlayer.pos > 19) {
+                    currentPlayer.pos = 0;
+                    currentPlayer.cycle++;
+                    continue;
+                }
+                gameBoard[currentPlayer.pos].setTile(currentPlayer);
+            } else playersMadeCycle++;
 
-            if (currentPlayer.pos > 19) {
-                currentPlayer.pos = 0;
-                currentPlayer.cycle++;
-
-            }
-            System.out.println("Player " + currentPlayer.id + " moved to position " + currentPlayer.pos);
-            gameBoard[currentPlayer.pos].setTile(currentPlayer);
         }
-        return cnt==players.length;
+        return playersMadeCycle ==players.length;
     }
 
+    /**
+     * Sorts the list of players in descending order by their парички
+     */
     public void sortPlayers() {
         int n = players.length;
         for (int i = 0; i < n - 1; i++)
             for (int j = 0; j < n - i - 1; j++)
                 if (players[j].cash < players[j + 1].cash) {
-                    Player temp = players[j];
+                    Player tempPlayer = players[j];
                     players[j] = players[j + 1];
-                    players[j + 1] = temp;
+                    players[j + 1] = tempPlayer;
                 }
 
     }
 
     /**
      * Shuffles the positions of the tiles in the game board.
-     * The Start tile stays in its place, unaffected by the shuffle
+     * The {@code Start} tile stays in its place, unaffected by the shuffle
      */
     public void shuffleBoard() {
-        Tile temp;
-        int newPos;
+        Tile tempTile;
+        int newTilePosition;
         Random random = new Random();
         for (int i = 1; i < gameBoard.length; i++) {
-            newPos = random.nextInt(19) + 1;
+            newTilePosition = random.nextInt(19) + 1;
 
-            temp = gameBoard[newPos];
-            gameBoard[newPos] = gameBoard[i];
-            gameBoard[newPos].pos = newPos;
-            gameBoard[i] = temp;
+            tempTile = gameBoard[newTilePosition];
+            gameBoard[newTilePosition] = gameBoard[i];
+            gameBoard[newTilePosition].pos = newTilePosition;
+            gameBoard[i] = tempTile;
             gameBoard[i].pos = i;
         }
     }
 
     /**
-     * Prints the board to the console
+     * Prints the game board to the console
      */
     public void printBoard() {
         printLine(46);
@@ -120,6 +121,10 @@ public class Game {
         printLowerBoard();
         printLine(46);
     }
+
+    /**
+     * Prints the upper part of the game board - tile positions [10;17]
+     */
     private void printUpperBoard(){
         System.out.print("|      ");
         for (int i = 10; i <= 17; i++) System.out.print(String.format("|%d|",i));
@@ -129,6 +134,10 @@ public class Game {
         System.out.println("      |");
 
     }
+
+    /**
+     * Prints the middle part of the game board - tile positions [8;9] and [18;19]
+     */
     private void printMiddleBoard(){
 
         System.out.print(String.format("|  |%d ||%s|                        ",9, gameBoard[9].tileSymbol));
@@ -139,6 +148,10 @@ public class Game {
 
 
     }
+
+    /**
+     * Prints the lower part of the game board - tile positions [0;7]
+     */
     private void printLowerBoard(){
         System.out.print("|      ");
         for (int i = 7; i >= 0; i--) System.out.print(String.format("|%s|", gameBoard[i].tileSymbol));
@@ -148,28 +161,32 @@ public class Game {
         System.out.println("      |");
     }
 
-
+    /**
+     * Prints the player information needed for the current player to take a decision.
+     * The player`s ID, position, current парички balance
+     */
     public void printPlayerInfo(){
-        printLine();
+        // TODO: 11-May-20 Add option to show detailed information about all players
+        printLine(60);
         String playerName;
         for (Player player :
                 players) {
             if(player.isBot) playerName="Bot";
             else  playerName = "Player";
+
             String playerInfo = String.format("|%s %d is located at position %d with cash balance %d"
                     ,playerName,player.id,player.pos,player.cash);
             String blankSpaces = " ".repeat(60-playerInfo.length()-1);
             System.out.println(String.format("%s%s|",playerInfo,blankSpaces));
         }
-        printLine();
+        printLine(60);
     }
 
-    public void printLine(int x){
-        for (int i=0;i< x;i++) System.out.print("-");
-        System.out.println();
-    }
-    public void printLine(){
-        for (int i=0;i< 60;i++) System.out.print("-");
-        System.out.println();
+    /**
+     * Prints a line of character a certain amount of times
+     * @param repetitions the number of character repetitions
+     */
+    public void printLine(int repetitions){
+        System.out.println("-".repeat(repetitions));
     }
 }

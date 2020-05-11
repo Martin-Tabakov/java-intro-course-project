@@ -11,6 +11,11 @@ public class Tile {
     int pos;
     String tileSymbol;
 
+    /**
+     * Constructor for a tile. Creates a tiles specific role based on its ID
+     * @param id ID of the tiles behaviour
+     * @param pos The position where it is located on the board
+     */
     public Tile(int id,int pos){
         this.id = id;
         this.pos = pos;
@@ -18,7 +23,7 @@ public class Tile {
     }
 
     /**
-     * Activates the effect of the tile the player is placed on
+     * Activates this tile`s effects when a player lands on it
      * @param player Current active player, stepping on a tile
      */
     public void setTile(Player player){
@@ -32,6 +37,9 @@ public class Tile {
         }
     }
 
+    /**
+     * Creates a new type of tile based on this tile`s ID
+     */
     private void createTile(){
         switch (id){
             case 0: start = new Start(); tileSymbol = "St"; break;
