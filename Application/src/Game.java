@@ -91,7 +91,7 @@ public class Game {
                 if (currentPlayer.pos > 19) {
                     currentPlayer.pos = 0;
                     currentPlayer.cycle++;
-                    System.out.println("Player "+player.id+" moves to "+player.pos);
+                    System.out.println("Player "+player.id+" moves to position "+player.pos);
                     continue;
                 }
                 System.out.println("Player "+player.id+" moves to "+player.pos);
@@ -219,12 +219,12 @@ public class Game {
      */
     public void printPlayerInfo(){
         printLine(60);
-        String playerName;
+        String playerType;
         for (Player player :players) {
-            playerName=(player.isBot)?"Bot":"Player";
+            playerType=(player.isBot)?"Bot":"Player";
 
             String playerInfo = String.format("%s %d is located at position %d with cash balance %d"
-                    ,playerName,
+                    ,playerType,
                     player.id,
                     player.pos
                     ,player.cash);
