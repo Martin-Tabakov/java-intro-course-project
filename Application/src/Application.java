@@ -3,12 +3,10 @@ import java.util.Random;
 public class Application {
     public static void main(String[] args){
         Game game = new Game();
+        game.setBotQuantity();
         game.shuffleBoard();
-        game.printBoard();
-        game.gameCycle();
-        game.gameCycle();
-        game.gameCycle();
-        game.gameCycle();
+        game.makeCycle();
+        System.out.println("/////////////////////////////////////////////////////////////");
     }
 
     /**

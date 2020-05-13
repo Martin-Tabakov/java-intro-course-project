@@ -3,7 +3,8 @@ public class Steal {
     boolean isTaken=false;
 
     public void steal(Player player){
-        System.out.println("Looks like we have a robber! He is Player "+player.id);
+        checkEvilPlan(player);
+        System.out.println("Looks like we have a robber!"+player.getPlayerType()+player.id);
         if(planId==0 && !player.isPlanActive && !isTaken) assignPlan(player);
     }
     private void assignPlan(Player player){
@@ -14,5 +15,11 @@ public class Steal {
     public void clearTile(){
         this.planId=0;
         isTaken=false;
+    }
+    private void checkEvilPlan(Player player){
+        if(player.isPlanActive && player.planId==3) {
+            player.cash += 100;
+            System.out.println("Evil plan activated "+ player.getPlayerType() + player.id);
+        }
     }
 }

@@ -1,13 +1,14 @@
 import java.util.Random;
+import java.util.Scanner;
 
 public class Game {
     int gameCycle = 0;
     Tile[] gameBoard = new Tile[20];
-    Player[] players = new Player[5];
+    Player[] players;
+    Scanner scanner = new Scanner(System.in);
 
     public Game() {
         initBoard();
-        initPlayers();
     }
 
     /**
@@ -27,12 +28,19 @@ public class Game {
         for(;i<=19;i++) gameBoard[i] = new Tile(id,i);
     }
 
+    public void setBotQuantity(){
+        System.out.print("Select how many bots you want to play against: ");
+        int quantity = scanner.nextInt();
+        initPlayers(quantity);
+    }
+
     /**
      * Initialises the partaker`s positions and IDs
      */
-    private void initPlayers() {
+    private void initPlayers(int quantity) {
+        players = new Player[quantity+1];
         players[0] = new Player(1, false, 0);
-        for(int i=1;i<5;i++) players[i] = new Player(i+1, true, 0);
+        for(int i=1;i<players.length;i++) players[i] = new Player(i+1, true, 0);
     }
 
     /**
@@ -63,14 +71,14 @@ public class Game {
      * Calculates парички for players after completing a game cycle
      */
     private void calculateBalance(){
-        for (Player player : players) Start.calculateCash(player);
+        for (Player player : players) player.calculateCash();
     }
     /**
      * Assigns every player an evil plan
      */
     private void assignEvilPlans(){
         for (Player player : players) {
-            Start.assignEvilPlan(player);
+            player.assignEvilPlan();
         }
     }
 
@@ -80,21 +88,19 @@ public class Game {
      * @return {@code true} if all players made a cycle, otherwise {@code true}
      */
     public boolean playerCycle() {
-        Player currentPlayer;
         int playersMadeCycle =0;
 
-        for (Player player : players) {
-            currentPlayer = player;
+        for (Player currentPlayer : players) {
 
             if (currentPlayer.cycle == gameCycle) {
-                player.makeTurn();
+                currentPlayer.makeTurn();
                 if (currentPlayer.pos > 19) {
                     currentPlayer.pos = 0;
                     currentPlayer.cycle++;
-                    System.out.println("Player "+player.id+" moves to position "+player.pos);
+                    System.out.println(currentPlayer.getPlayerType()+currentPlayer.id+" moves to position "+currentPlayer.pos);
                     continue;
                 }
-                System.out.println("Player "+player.id+" moves to "+player.pos);
+                System.out.println(currentPlayer.getPlayerType() +currentPlayer.id+" moves to position "+currentPlayer.pos);
                 gameBoard[currentPlayer.pos].setTile(currentPlayer);
             } else playersMadeCycle++;
 
@@ -219,15 +225,13 @@ public class Game {
      */
     public void printPlayerInfo(){
         printLine(60);
-        String playerType;
         for (Player player :players) {
-            playerType=(player.isBot)?"Bot":"Player";
 
-            String playerInfo = String.format("%s %d is located at position %d with cash balance %d"
-                    ,playerType,
+            String playerInfo = String.format("%s %d is located at position %d with cash balance %d",
+                    player.getPlayerType(),
                     player.id,
-                    player.pos
-                    ,player.cash);
+                    player.pos,
+                    player.cash);
 
             int totalSpaces =58-playerInfo.length();
                 String rightSpaces = " ".repeat(totalSpaces/2+totalSpaces%2);

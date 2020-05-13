@@ -1,6 +1,5 @@
 public class Tile {
 
-    Start start = null;
     Invest invest = null;
     Steal steal = null;
     Chance chance = null;
@@ -27,16 +26,16 @@ public class Tile {
      */
     public void setTile(Player player){
         switch (id){
-            case 0: Start.calculateCash(player); break;
+            case 0: player.calculateCash(); break;
             case 1: invest.invest(player); break;
             case 2: steal.steal(player); break;
             case 3: chance.activateChance(player); break;
-            case 4: partyHard(player); break;
+            case 4: startParty(player); break;
             case 5: trap.activate(player); break;
         }
     }
 
-    private void partyHard(Player player){
+    private void startParty(Player player){
         System.out.println("Party started! Host is Player "+player.id);
         player.cash-=25;
     }
@@ -46,7 +45,7 @@ public class Tile {
      */
     private void createTile(){
         switch (id){
-            case 0: start = new Start(); tileSymbol = "S "; break;
+            case 0: tileSymbol = "S "; break;
             case 1: invest = new Invest(); tileSymbol = "I "; break;
             case 2: steal = new Steal(); tileSymbol = "St" ; break;
             case 3: chance = new Chance(); tileSymbol = "C "; break;
