@@ -5,11 +5,19 @@ public class Chance {
         getChancePositivity(player);
     }
     private void getChancePositivity(Player player){
-        int dice= Application.throwDice(1,10);
+        int dice= activeDeBuff(player);
         int dice2= Application.throwDice(1,100);
+
         if(dice%2==0) positiveChance(dice2,player);
         else negativeChance(dice2,player);
 
+    }
+
+    private int activeDeBuff(Player player){
+        if (player.trapsID[5]==0) return Application.throwDice(1,10);
+
+        player.trapsID[5]=0;
+        return 1;
     }
     private void positiveChance(int rng,Player player){
         player.cash+=rng;

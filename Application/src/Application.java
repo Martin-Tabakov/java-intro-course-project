@@ -27,4 +27,8 @@ public class Application {
             return rnd + lowerBound;
         }
     }
+    public static boolean isNumberInRange(int number, int lowerBound, int upperBound)
+    {
+        return number>=lowerBound && number<=upperBound;
+    }
 }
