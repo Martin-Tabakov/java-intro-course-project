@@ -7,6 +7,9 @@ public class Game {
     Player[] players;
     Scanner scanner = new Scanner(System.in);
 
+    /**
+     * Constructor for the Game
+     */
     public Game() {
         initBoard();
     }
@@ -28,8 +31,11 @@ public class Game {
         for(;i<=19;i++) gameBoard[i] = new Tile(id,i);
     }
 
+    /**
+     * Selects the number of bots to participate in the game and initialises the player array
+     */
     public void setBotQuantity(){
-        System.out.print("Select how many bots you want to play against: ");
+        System.out.print("Избери с колко Бота ще играеш: ");
         int quantity = scanner.nextInt();
         initPlayers(quantity);
     }
@@ -39,12 +45,13 @@ public class Game {
      */
     private void initPlayers(int quantity) {
         players = new Player[quantity+1];
-        players[0] = new Player(1, false, 0);
-        for(int i=1;i<players.length;i++) players[i] = new Player(i+1, true, 0);
+        players[0] = new Player(1, false);
+        for(int i=1;i<players.length;i++) players[i] = new Player(i+1, true);
     }
 
     /**
-     * Makes a game cycle - all players go through the board to the starting position from where they began
+     * Makes a game cycle
+     * Cycle - One full rotation of all players through the board to the starting position from where they began
      */
     public void makeCycle() {
         gameCycle++;
@@ -57,18 +64,18 @@ public class Game {
         }
         sortPlayers();
         calculateBalance();
-        clearTiles();
+        clearStealTiles();
     }
 
     /**
      * Resets all {@code Steal} tiles to be reused
      */
-    private void clearTiles(){
+    private void clearStealTiles(){
         for (Tile tile : gameBoard) if (tile.id == 2) tile.steal.clearTile();
     }
 
     /**
-     * Calculates парички for players after completing a game cycle
+     * Calculates the парички for players after completing a game cycle
      */
     private void calculateBalance(){
         for (Player player : players) player.calculateCash();
@@ -77,33 +84,30 @@ public class Game {
      * Assigns every player an evil plan
      */
     private void assignEvilPlans(){
-        for (Player player : players) {
-            player.assignEvilPlan();
-        }
+        for (Player player : players) player.assignEvilPlan();
     }
 
     /**
-     * Cycles through the list of players prompting them to take a turn.
-     * If the player`s cycle is equal to the game cycle a move will be made and the tile where the player lands will be activated
-     * @return {@code true} if all players made a cycle, otherwise {@code true}
+     * Cycles through the list of players prompting them to take a turn.<br><hr>
+     * If the current Player`s cycle is equal to the game cycle a move will be made and the tile where the player lands will be activated<br>
+     * Otherwise his turn will be skipped as he is waiting on the {@code Start} position for the rest of the players to complete their cycle<br>
+     * @return {@code true} if all players made a cycle, otherwise {@code false}
      */
     public boolean playerCycle() {
         int playersMadeCycle =0;
 
         for (Player currentPlayer : players) {
-
             if (currentPlayer.cycle == gameCycle) {
                 currentPlayer.makeTurn();
                 if (currentPlayer.pos > 19) {
                     currentPlayer.pos = 0;
                     currentPlayer.cycle++;
-                    System.out.println(currentPlayer.getPlayerType()+currentPlayer.id+" moves to position "+currentPlayer.pos);
+                    System.out.println(currentPlayer.getPlayerType()+currentPlayer.id+" се премести на "+currentPlayer.pos);
                     continue;
                 }
-                System.out.println(currentPlayer.getPlayerType() +currentPlayer.id+" moves to position "+currentPlayer.pos);
+                System.out.println(currentPlayer.getPlayerType() +currentPlayer.id+" се премести на "+currentPlayer.pos);
                 gameBoard[currentPlayer.pos].setTile(currentPlayer);
             } else playersMadeCycle++;
-
         }
         return playersMadeCycle ==players.length;
     }
@@ -142,6 +146,13 @@ public class Game {
     }
 
 
+    /**
+     * Prints a row of tiles
+     * @param begin The first tile`s position
+     * @param end The last tile`s position
+     * @param offset The number of whitespaces needed to center the board
+     * @param reverse If {@code true} the tiles will be in descending order If {@code false} the tiles will be printed in ascending order
+     */
     private void printTiles(int begin,int end,int offset,boolean reverse){
         System.out.println(String.format("|%s|%s|%s|",
                 " ".repeat(offset),
@@ -150,12 +161,22 @@ public class Game {
         ));
     }
 
+    /**
+     * Selects a certain amount of tiles and places them into a new Array
+     * @param begin The first tile`s position
+     * @param end The last tile`s position
+     * @param reverse If {@code true} the tiles will be in descending order If {@code false} the tiles will be printed in ascending order
+     * @return Array with tile symbols
+     */
     private String[] getRoll(int begin,int end,boolean reverse){
         String[] tiles = new  String[end-begin+1];
         for(int i=0;i<tiles.length;i++) tiles[i]=(reverse)? gameBoard[end-i].tileSymbol:gameBoard[begin+i].tileSymbol;
         return tiles;
     }
 
+    /**
+     * Prints the positions of certain tiles in a roll. Works ike {@code printTiles()}
+     */
     private void printNumbers(int begin,int end,int offset,boolean reverse){
         System.out.println(String.format("|%s|%s|%s|",
                 " ".repeat(offset),
@@ -164,6 +185,9 @@ public class Game {
         ));
     }
 
+    /**
+     * Does the same thing as the method {@code getRoll()} but for the tile positions
+     */
     private String[] createArray(int firstPos,int lastPos,boolean reverse){
         String[] newArray = new String[lastPos-firstPos+1];
         for(int i=0;i<newArray.length;i++) newArray[i]=(reverse)? convertNum(lastPos-i) : convertNum(firstPos+i);
@@ -171,6 +195,11 @@ public class Game {
         return  newArray;
     }
 
+    /**
+     * Converts a number into a string value and adds a white space after it if it is less than 10
+     * @param num The number to be converted
+     * @return The number converted into a String value
+     */
     private String convertNum(int num){
         return (num>9)? String.valueOf(num):(num)+" ";
     }
@@ -197,16 +226,14 @@ public class Game {
 
     /**
      * Prints the middle part of the game board - tile positions [8;9] and [18;19]
+     * Yes it is discussing o look at
      */
     private void printMiddleBoard(){
-
         System.out.print(String.format("|         |%d ||%s|                        ",9, gameBoard[9].tileSymbol));
         System.out.println(String.format("|%s||%d|         |", gameBoard[18].tileSymbol,18));
 
         System.out.print(String.format("|         |%d ||%s|                        ",8, gameBoard[8].tileSymbol));
         System.out.println(String.format("|%s||%d|         |", gameBoard[19].tileSymbol,19));
-
-
     }
 
     /**
@@ -220,14 +247,13 @@ public class Game {
 
 
     /**
-     * Prints the player information needed for the current player to take a decision.
-     * The player`s ID, position, current парички balance
+     * Prints all participants`  ID, position and current парички balance
      */
     public void printPlayerInfo(){
         printLine(60);
         for (Player player :players) {
 
-            String playerInfo = String.format("%s %d is located at position %d with cash balance %d",
+            String playerInfo = String.format("%s %d се намира на поле %d и има %d парички.",
                     player.getPlayerType(),
                     player.id,
                     player.pos,

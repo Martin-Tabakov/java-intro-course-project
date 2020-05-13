@@ -35,8 +35,12 @@ public class Tile {
         }
     }
 
+    /**
+     * Reduces money when a player lands on a {@code Party} tile
+     * @param player The current player placed on the tile
+     */
     private void startParty(Player player){
-        System.out.println("Party started! Host is Player "+player.id);
+        System.out.println("Парти започнато от "+player.getFullPlayerType());
         player.cash-=25;
     }
 

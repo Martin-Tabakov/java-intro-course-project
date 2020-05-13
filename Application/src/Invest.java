@@ -5,17 +5,28 @@ public class Invest {
     double returnRatio =0.2;
     int minRiskRatio = -5;
     int maxRiskRatio = 100;
+
+    /**
+     * Initiates the specific actions for the {@code Investment} tile
+     * @param player The current player placed on the tile
+     */
     public void invest(Player player){
         checkEvilPlan(player);
-        System.out.println("Investment time people! Current investor" +player.getPlayerType()+player.id);
+        System.out.println("Време е за инвестиция от " +player.getFullPlayerType());
 
     }
+
     private void assignCompany(Player player){
         player.companyId=0;
     }
+
+    /**
+     * Activates an Evil plan if the player has it and is active
+     * @param player The current player placed on the tile
+     */
     private void checkEvilPlan(Player player){
         if(player.isPlanActive && player.planId==2) {
-            System.out.println("Evil plan activated "+ player.getPlayerType() + player.id);
+            System.out.println("Зъл план активиран от "+ player.getFullPlayerType());
             player.cash += 100;
         }
     }
