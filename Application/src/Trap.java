@@ -1,8 +1,18 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
 public class Trap {
     int placedByPlayerID=0;
     int trapID;
     boolean isActive=false;
-    int[] trapPrice = new int[]{0,100,200,100,50,100};
+    int[] trapPrice = new int[6];
+    public Trap(){
+        for (int i = 1; i <= 5; i++) {
+            ArrayList<String> chance = Reader.read("Trap", i, 4);
+            int cost = Integer.parseInt(chance.get(3));
+            trapPrice[i]= cost;
+        }
+    }
 
     /**
      * Initiates the specific actions for the {@code Trap} tile
@@ -77,8 +87,7 @@ public class Trap {
      * @param player The current player placed on the tile
      */
     private void playerPlacesTrap(Player player){
-        String[] temp = new String[]{"Ще сложиш ли капан? 0-Не","1-5"};
-        int trapChoice = Application.makeDecision(temp,0,5);
+        int trapChoice = makeDecision(0,5);
 
         if (trapChoice>0 && player.cash>=trapPrice[trapChoice]){
             player.cash-=trapPrice[trapChoice];
@@ -87,5 +96,26 @@ public class Trap {
             System.out.println("Капан е поставен от "+player.getFullPlayerType());
         }
         else System.out.println("Капан не е поставен от "+player.getFullPlayerType());
+    }
+
+    private void printMenu() {
+        System.out.println("(0) : Не, благодаря, не вярвам в злото");
+        for (int i = 1; i <= 5; i++) {
+            ArrayList<String> chance = Reader.read("Trap", i, 4);
+            String trapName = chance.get(0);
+            int cost = Integer.parseInt(chance.get(3));
+            System.out.println(String.format("(%d) : %s (%d)",i,trapName,cost));
+        }
+    }
+    public int makeDecision(int lowerBound,int upperBound){
+        Scanner scanner = new Scanner(System.in);
+        boolean correctInput = false;
+        int option=0;
+        while (!correctInput){
+            printMenu();
+            option=scanner.nextInt();
+            correctInput= Application.isNumberInRange(option,lowerBound,upperBound);
+        }
+        return option;
     }
 }
