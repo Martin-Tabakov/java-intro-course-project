@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Steal {
     int planId=0;
     boolean isTaken=false;
@@ -8,7 +10,6 @@ public class Steal {
      */
     public void steal(Player player){
         checkEvilPlan(player);
-        System.out.println("Крадец "+player.getFullPlayerType());
         if(activeDeBuff(player)) return;
         if(planId==0 && !player.isPlanActive && !isTaken) setTilePlan(player);
     }
@@ -20,7 +21,7 @@ public class Steal {
      */
     private boolean activeDeBuff(Player player){
         if(player.trapsID[4]>0){
-            System.out.println("Active De-Buff! Cant Activate Trap!");
+            System.out.println("Активен Дебъф. Активиране на Зъл план невъзможно!");
             player.trapsID[4]=0;
             return true;
         }
@@ -32,6 +33,8 @@ public class Steal {
      * @param player The current player
      */
     private void setTilePlan(Player player){
+        ArrayList<String> data = Reader.read("Steal",player.planId,3);
+        for (String datum : data) System.out.println(datum);
         isTaken=true;
         planId= player.planId;
         player.isPlanActive=true;
@@ -53,6 +56,8 @@ public class Steal {
         if(player.isPlanActive && player.planId==3) {
             player.cash += 100;
             System.out.println("Зъл план активиран от "+ player.getFullPlayerType());
+            String desc= Reader.read("Steal",3,3).get(2);
+            System.out.println(desc);
         }
     }
 }
