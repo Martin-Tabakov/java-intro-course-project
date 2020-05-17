@@ -70,7 +70,7 @@ public class Reader {
      * @return {@code true} if the ID has been found, otherwise {@code false}
      */
     private static boolean findLineID(Scanner sc, int ID) {
-        String id = " " +ID;
+        String id = "ID" +ID;
         while (sc.hasNextLine()) {
             String line = sc.nextLine();
             if (line.equals(id)) return true;
