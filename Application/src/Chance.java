@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Chance {
 
     /**
@@ -6,7 +8,6 @@ public class Chance {
      */
     public void activateChance(Player player){
         checkEvilPlan(player);
-        System.out.println("Живота даде шанс на "+player.getFullPlayerType());
         getChancePositivity(player);
     }
 
@@ -42,8 +43,7 @@ public class Chance {
      * @param player The current player placed on the tile
      */
     private void positiveChance(int rng,Player player){
-        player.cash+=rng;
-        System.out.println("Позитивен Шанс за "+player.getFullPlayerType());
+        findChance(rng,5,player);
     }
 
     /**
@@ -52,8 +52,7 @@ public class Chance {
      * @param player The current player placed on the tile
      */
     private void negativeChance(int rng,Player player){
-        player.cash-=rng;
-        System.out.println("Негативен Шанс за "+player.getFullPlayerType());
+        findChance(rng,0,player);
     }
 
     /**
@@ -64,6 +63,26 @@ public class Chance {
         if(player.isPlanActive && player.planId==1){
             System.out.println("Зъл план активиран от "+ player.getFullPlayerType());
             player.cash+=100;
+            String desc= Reader.read("Steal",1,3).get(2);
+            System.out.println(desc);
+        }
+    }
+
+    private void findChance(int rng,int offset,Player player){
+        for(int i=1+offset;i<=5+offset;i++){
+            ArrayList<String> chance = Reader.read("Chance",i,5);
+            String chanceName = chance.get(0);
+            String chanceDesc = chance.get(1);
+            int rangeMin =Integer.parseInt(chance.get(2));
+            int rangeMax =Integer.parseInt(chance.get(3));
+            int money =Integer.parseInt(chance.get(4));
+
+            if(rng>=rangeMin && rng <=rangeMax){
+                player.cash+=money;
+                System.out.println(chanceName);
+                System.out.println(chanceDesc);
+                return;
+            }
         }
     }
 }
