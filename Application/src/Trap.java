@@ -18,7 +18,6 @@ public class Trap {
      * Initiates the specific actions for the {@code Trap} tile
      * @param player The current player placed on the tile
      */
-    // TODO: 13-May-20 Re-Check Functionality
     public void activate(Player player){
         if(isActive) setOff(player);
         else placeTrap(player);

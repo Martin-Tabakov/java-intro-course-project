@@ -1,24 +1,25 @@
+import java.util.ArrayList;
+
 public class Player {
 
     int id;
-    int companyId=0;
     int pos=0;
     int cash=1000;
-    int income;
-    int profit;
-    int expenditure;
+    int income=0;
+    int expenses=0;
+    int profit=0;
     int cycle=1;
     int planId=0;
     int[] trapsID = new int[6];
     boolean isPlanActive;
     boolean isBot;
+    ArrayList<ArrayList<String>> investedCompanies = new ArrayList<>();
 
     /**
      * Constructor for a game Participant(Player/Bot)
      * @param id Participant unique ID
      * @param isBot {@code true} If the participant is a Bot, {@code false } if he is a Player
      */
-    // TODO: 11-May-20 Add human player Interface
     public Player(int id,boolean isBot) {
         this.id = id;
         this.isBot = isBot;
@@ -52,18 +53,46 @@ public class Player {
      * Calculates the remaining парички for the player after completing a game cycle
      */
     public void calculateCash(){
-        computeDeBuffs();
-        System.out.println("Начало на ход за " +getFullPlayerType());
+        computeInvestments();
+        calcIncomeDeBuff();
+        profit=income;
+        calcProfitDeBuff();
+
+        System.out.println(getFullPlayerType() +" печалба " + profit);
+        cash+=profit;
+        profit=0;
+        income=0;
+        expenses=0;
+    }
+
+    private void computeInvestments(){
+        ArrayList<String> temp;
+        if(investedCompanies.size()==0) System.out.println("Its empty man!");
+        for (ArrayList<String> investedCompany : investedCompanies) {
+            temp = investedCompany;
+            int investedCash = Integer.parseInt(temp.get(0));
+            float returnMultiplier = Float.parseFloat(temp.get(1));
+            int bottomRange = Integer.parseInt(temp.get(2));
+            int topRange = Integer.parseInt(temp.get(3));
+            int rng = Application.throwDice(bottomRange, topRange);
+            System.out.println(String.format("%d %d %d %d",investedCash,bottomRange,topRange,rng));
+            expenses+=investedCash;
+            if (rng >= 0) income+= investedCash * returnMultiplier + investedCash;
+        }
+        investedCompanies = new ArrayList<>();
     }
 
     /**
      * Calculates the de buffs that affect the profits and income of the player after the game cycle
      */
-    private void computeDeBuffs(){
+    private void calcProfitDeBuff(){
         int dice =Application.throwDice(1,10);
         if(trapsID[2]>0 && profit>0 && (dice==2 || dice==8)) profit=0;
 
-        for(int i=1;i< trapsID[1];i++) profit-=profit/10;
+
+    }
+    private void calcIncomeDeBuff(){
+        for(int i=0;i< trapsID[1];i++) income-=income/10;
     }
 
     /**

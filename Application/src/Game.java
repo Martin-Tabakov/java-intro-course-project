@@ -1,10 +1,13 @@
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Game {
     int gameCycle = 0;
+    boolean haveWinner=false;
+    Player winner;
     Tile[] gameBoard = new Tile[20];
-    Player[] players;
+    ArrayList<Player> players= new ArrayList<>();
     Scanner scanner = new Scanner(System.in);
 
     /**
@@ -44,9 +47,8 @@ public class Game {
      * Initialises the partaker`s positions and IDs
      */
     private void initPlayers(int quantity) {
-        players = new Player[quantity+1];
-        players[0] = new Player(1, false);
-        for(int i=1;i<players.length;i++) players[i] = new Player(i+1, true);
+        players.add(new Player(1, false));
+        for(int i=0;i<quantity;i++) players.add(new Player(i+1, true));
     }
 
     /**
@@ -60,11 +62,17 @@ public class Game {
         while (!isPartialCycle) {
             printBoard();
             printPlayerInfo();
+
             isPartialCycle= playerCycle();
         }
         sortPlayers();
         calculateBalance();
         clearStealTiles();
+        resetDeBuffs();
+    }
+
+    private void resetDeBuffs(){
+        for(Player player : players) Arrays.fill(player.trapsID, 0);
     }
 
     /**
@@ -78,7 +86,9 @@ public class Game {
      * Calculates the парички for players after completing a game cycle
      */
     private void calculateBalance(){
-        for (Player player : players) player.calculateCash();
+        for (Player player : players) {
+            player.calculateCash();
+        }
     }
     /**
      * Assigns every player an evil plan
@@ -95,6 +105,8 @@ public class Game {
      */
     public boolean playerCycle() {
         int playersMadeCycle =0;
+        removeBankruptPlayers();
+            if(haveWinner()) return true;
 
         for (Player currentPlayer : players) {
             if (currentPlayer.cycle == gameCycle) {
@@ -102,27 +114,49 @@ public class Game {
                 if (currentPlayer.pos > 19) {
                     currentPlayer.pos = 0;
                     currentPlayer.cycle++;
-                    System.out.println(currentPlayer.getPlayerType()+currentPlayer.id+" се премести на "+currentPlayer.pos);
+                    System.out.println(currentPlayer.getFullPlayerType()+" се премести на "+currentPlayer.pos);
                     continue;
                 }
-                System.out.println(currentPlayer.getPlayerType() +currentPlayer.id+" се премести на "+currentPlayer.pos);
+                System.out.println(currentPlayer.getFullPlayerType()+" се премести на "+currentPlayer.pos);
                 gameBoard[currentPlayer.pos].setTile(currentPlayer);
             } else playersMadeCycle++;
         }
-        return playersMadeCycle ==players.length;
+        return playersMadeCycle ==players.size();
+    }
+
+    private void removeBankruptPlayers(){
+        ArrayList<Player> toRemove = new ArrayList<>();
+        for (Player currentPlayer : players) {
+            if (checkBankrupt(currentPlayer)) toRemove.add(currentPlayer);
+        }
+
+            for (Player player : toRemove) players.remove(player);
+    }
+
+    private boolean haveWinner(){
+        if(players.size() ==1){
+            haveWinner =true;
+            winner = players.get(0);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean checkBankrupt(Player currentPlayer){
+        return currentPlayer.cash < 0;
     }
 
     /**
      * Sorts the list of players in descending order by their парички
      */
     public void sortPlayers() {
-        int n = players.length;
+        int n = players.size();
         for (int i = 0; i < n - 1; i++)
             for (int j = 0; j < n - i - 1; j++)
-                if (players[j].cash < players[j + 1].cash) {
-                    Player tempPlayer = players[j];
-                    players[j] = players[j + 1];
-                    players[j + 1] = tempPlayer;
+                if (players.get(j).cash < players.get(j + 1).cash) {
+                    Player tempPlayer = players.get(j);
+                    players.set(j,players.get(j + 1));
+                    players.set(j + 1,tempPlayer);
                 }
     }
 
@@ -133,9 +167,8 @@ public class Game {
     public void shuffleBoard() {
         Tile tempTile;
         int newTilePosition;
-        Random random = new Random();
         for (int i = 1; i < gameBoard.length; i++) {
-            newTilePosition = random.nextInt(19) + 1;
+            newTilePosition = Application.throwDice(1,20);
 
             tempTile = gameBoard[newTilePosition];
             gameBoard[newTilePosition] = gameBoard[i];
@@ -226,7 +259,7 @@ public class Game {
 
     /**
      * Prints the middle part of the game board - tile positions [8;9] and [18;19]
-     * Yes it is discussing o look at
+     * Yes it is discussing to look at
      */
     private void printMiddleBoard(){
         System.out.print(String.format("|         |%d ||%s|                        ",9, gameBoard[9].tileSymbol));
