@@ -22,7 +22,7 @@ public class Steal {
     private boolean activeDeBuff(Player player){
         if(player.trapsID[4]>0){
             System.out.println("Активен Дебъф. Активиране на Зъл план невъзможно!");
-            player.trapsID[4]=0;
+            player.trapsID[4]-=1;
             return true;
         }
         return false;

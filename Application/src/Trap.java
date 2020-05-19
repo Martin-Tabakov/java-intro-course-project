@@ -6,6 +6,10 @@ public class Trap {
     int trapID;
     boolean isActive=false;
     int[] trapPrice = new int[6];
+
+    /**
+     * Sets the costs for all the traps
+     */
     public Trap(){
         for (int i = 1; i <= 5; i++) {
             ArrayList<String> chance = Reader.read("Trap", i, 4);
@@ -29,7 +33,7 @@ public class Trap {
      * @param player The current player placed on the tile
      */
     private void setOff(Player player){
-        int dice =Application.throwDice(1,10);
+        int dice =Application.RNG(1,10);
 
         if(player.id==placedByPlayerID && dice%3==0) {
             System.out.println("Попадна в свой капан, но избегна последствията!");
@@ -59,8 +63,8 @@ public class Trap {
      */
     private void botPlacesTrap(Player player){
 
-        if (Application.throwDice(0,1)==1){
-            int selectedTrap= Application.throwDice(1,5);
+        if (Application.RNG(0,1)==1){
+            int selectedTrap= Application.RNG(1,5);
             selectTrap(player,selectedTrap);
             return;
         }
@@ -97,6 +101,9 @@ public class Trap {
         else System.out.println("Капан не е поставен от "+player.getFullPlayerType());
     }
 
+    /**
+     * Prints the menu containing all information necessary for the player to make a decision whether to place a trap or not
+     */
     private void printMenu() {
         System.out.println("(0) : Не, благодаря, не вярвам в злото");
         for (int i = 1; i <= 5; i++) {
@@ -106,6 +113,13 @@ public class Trap {
             System.out.println(String.format("(%d) : %s (%d)",i,trapName,cost));
         }
     }
+
+    /**
+     * Forces the player to make a correct choice from the menu
+     * @param lowerBound Smallest menu option
+     * @param upperBound Largest menu option
+     * @return The options selected by the player
+     */
     public int makeDecision(int lowerBound,int upperBound){
         Scanner scanner = new Scanner(System.in);
         boolean correctInput = false;
